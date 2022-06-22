@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  project_one:
+    build: < select build path>
+    volumes:
+    # Select the project guide that you want to move to the docker : select where you need copy project path in docker
+      - ./project_one:/django/project_one
+    ports:
+    # Choose the port you want a project to work on
+      - "8001:8001"
+    # Set container name
+    container_name: project_one_container
+    # to run server
+    command: python /django/project_one/manage.py runserver 0.0.0.0:8001
+
+  project_two:
+    build: ./project_two
+    volumes:
+      - ./project_two:/django/project_two
+    ports:
+      - "8002:8002"
+    container_name: project_two_container
+    command: python /django/project_two/manage.py runserver 0.0.0.0:8002
+    depends_on:
+      - db
+
+  db:
+    # select image from docker hub
+    # this image for postgresql
+    image: postgres
+    # select where you need save database
+    # So you don't lose data when you restart the container or even when you delete, you'll still keep a local copy of the database.
+    volumes:
+      - ./project_two/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=<your username name>
+      - POSTGRES_PASSWORD=<your password>
+      - POSTGRES_DB=<your password>
+    container_name: postgresql_container
